@@ -1,8 +1,6 @@
-// 3
 import { nanoid } from 'nanoid';
 import { useState, useEffect } from 'react';
 import ContactForm from '../ContactForm/ContactForm';
-
 import SearchBox from '../SearchBox/SearchBox';
 import ContactList from '../ContactList/ContactList';
 import css from './App.module.css';
@@ -25,6 +23,7 @@ export default function App() {
     const storedReviews = localStorage.getItem('localData');
     return storedReviews ? JSON.parse(storedReviews) : data;
   });
+
   const [searchValue, setSearchValue] = useState('');
 
   const handleSubmit = (value, actions) => {
@@ -33,24 +32,26 @@ export default function App() {
   };
 
   useEffect(() => {
-    values !== data ? localStorage.setItem('localData', JSON.stringify(values)) : '';
+    if (values.length !== data.length) {
+      localStorage.setItem('localData', JSON.stringify(values));
+    }
   }, [values]);
 
-  const handlerDelete = idToDelete => {
+  const handleDelete = idToDelete => {
     setValues(values.filter(value => value.id !== idToDelete));
   };
 
   useEffect(() => {
-    values !== data && values.length !== 0
-      ? localStorage.setItem('localData', JSON.stringify(values))
-      : '';
+    if (values.length !== data.length && values.length !== 0) {
+      localStorage.setItem('localData', JSON.stringify(values));
+    }
   }, [values]);
 
   const handleSearch = event => {
     setSearchValue(event.target.value);
   };
 
-  const Filtered =
+  const filteredContacts =
     searchValue.trim() !== ''
       ? values.filter(value => value.name.toLowerCase().includes(searchValue.toLowerCase().trim()))
       : values;
@@ -60,7 +61,7 @@ export default function App() {
       <h1>Phonebook</h1>
       <ContactForm initialValues={initialValues} onAdd={handleSubmit} />
       <SearchBox inputValue={searchValue} onChange={handleSearch} />
-      <ContactList contacts={Filtered} onDelete={handlerDelete} />
+      <ContactList contacts={filteredContacts} onDelete={handleDelete} />
     </div>
   );
 }
